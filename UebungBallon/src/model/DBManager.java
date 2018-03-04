@@ -114,6 +114,23 @@ public class DBManager {
 			pstmt.close();
 	}
 	
+	
+	public void insertReise(int rbID, int fID, Connection conn) {
+		// TODO Auto-generated method stub
+		String SQL = "INSERT INTO reise (ReiseBuchungsID, FlugIDs) VALUES (?,?);";
+		try {
+			stmt = conn.createStatement();
+			pstmt.setInt(1, rbID);
+			pstmt.setInt(1, fID);
+			stmt.executeUpdate(SQL);
+			stmt.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void insertBuchung(int idb, String datum, int pID, int rID, Connection conn) throws SQLException {
 		// TODO Auto-generated method stub
 		String SQL = "INSERT INTO buchung (BuchungsID,Datum,PassagierID, ReiseBuchungsID) VALUES (?,?,?,?);";
@@ -127,44 +144,18 @@ public class DBManager {
 		
 	}
 	
-	public void deletePassagier(int pid,Connection conn) throws SQLException{
+	public void insertBallonFahrt(int fID, String zp, int p, int maxp, int pID, int oid, Connection conn) throws SQLException {
 		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM passagier WHERE PassagierID = '"+pid+"'";
-		stmt = conn.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	public void deleteOrt(int oid,Connection conn) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM ort WHERE OrtID = '"+oid+"'";
-		stmt = conn.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	public void deleteBuchung(int bid,Connection conn) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM buchung WHERE BuchungsID = '"+bid+"'";
-		stmt = conn.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	public void deleteReise(int rid,Connection con) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM reise WHERE ReiseBuchungsID = '"+rid+"'";
-		stmt = con.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	public void deletBallonfahrt(int flid,Connection con) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM ballonfahrt WHERE FlugID = '"+flid+"'";
-		stmt = con.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
+		String SQL = "INSERT INTO ballonfahrt (FlugID,Zeitpunkt,Preis, MaxAnzPersonen, PilotID, OrtID) VALUES (?,?,?,?,?,?);";
+		pstmt = conn.prepareStatement(SQL);
+		pstmt.setInt(1, fID);
+		pstmt.setString(1, zp);
+		pstmt.setInt(3,p);
+		pstmt.setInt(3,maxp);
+		pstmt.setInt(3,pID);
+		pstmt.setInt(3,oid);
+		pstmt.executeUpdate();
+		pstmt.close();	
 	}
 	
 	public String[][] getPassagiere(Connection con) throws SQLException{
@@ -314,6 +305,48 @@ public class DBManager {
 		return daten;
 	}
 	
+	public void deletePassagier(int pid,Connection conn) throws SQLException{
+		// TODO Auto-generated method stub
+		String SQL = "DELETE FROM passagier WHERE PassagierID = '"+pid+"'";
+		stmt = conn.createStatement();
+		stmt.executeUpdate(SQL);
+		stmt.close();
+	}
+	
+	public void deleteOrt(int oid,Connection conn) throws SQLException{
+		// TODO Auto-generated method stub
+		String SQL = "DELETE FROM ort WHERE OrtID = '"+oid+"'";
+		stmt = conn.createStatement();
+		stmt.executeUpdate(SQL);
+		stmt.close();
+	}
+	
+	public void deleteBuchung(int bid,Connection conn) throws SQLException{
+		// TODO Auto-generated method stub
+		String SQL = "DELETE FROM buchung WHERE BuchungsID = '"+bid+"'";
+		stmt = conn.createStatement();
+		stmt.executeUpdate(SQL);
+		stmt.close();
+	}
+	
+	public void deleteReise(int rid,Connection con) throws SQLException{
+		// TODO Auto-generated method stub
+		String SQL = "DELETE FROM reise WHERE ReiseBuchungsID = '"+rid+"'";
+		stmt = con.createStatement();
+		stmt.executeUpdate(SQL);
+		stmt.close();
+	}
+	
+	public void deleteBallonfahrt(int flid,Connection con) throws SQLException{
+		// TODO Auto-generated method stub
+		String SQL = "DELETE FROM ballonfahrt WHERE FlugID = '"+flid+"'";
+		stmt = con.createStatement();
+		stmt.executeUpdate(SQL);
+		stmt.close();
+	}
+	
+	
+	
 	public static void main(String[] argv) {
 
 		try{
@@ -329,24 +362,6 @@ public class DBManager {
 			e.printStackTrace();
 		}
 
-	}
-
-	public void insertReise(int rbID, int fID, Connection conn) {
-		// TODO Auto-generated method stub
-		String SQL = "INSERT INTO reise (ReiseBuchungsID, FlugIDs) VALUES (?,?);";
-		try {
-			stmt = conn.createStatement();
-			pstmt.setInt(1, rbID);
-			pstmt.setInt(1, fID);
-			stmt.executeUpdate(SQL);
-			stmt.close();
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
 	}
 
 }

@@ -97,20 +97,23 @@ public class TestBallon {
 	@Test
 	public void shouldInsertBuchung() throws InstantiationException, IllegalAccessException{
 		try {
-			DBManager t= new DBManager();
-			conn = t.getConnection();
+			DBManager db= new DBManager();
+			conn = db.getConnection();
 
+			db.insertBallonFahrt(3, "1.1.1", 122, 3, 2, 2, conn);
+			db.insertReise(2, 3, conn);
+			/** nicht Testrelevant **/
+			
 			Calendar calendar = Calendar.getInstance();
 			java.sql.Timestamp d = new java.sql.Timestamp(calendar.getTime().getTime());
 
-			/** nicht Testrelevant **/
 			SimpleDateFormat dn = new SimpleDateFormat("dd.MM.yyyy");
 			String pD = dn.format(calendar.getTime());
 			
-			t.insertBuchung(3, pD , 1, 1, conn);
+			db.insertBuchung(2, pD , 2, 2, conn);
 			
 			String[] daten = new String[5];
-			daten = t.getBuchung(3, conn);
+			daten =db.getBuchung(3, conn);
 			
 			assertEquals(3,daten[0]);
 			assertEquals(pD,daten[1]);
@@ -119,7 +122,9 @@ public class TestBallon {
 			
 			/** Aufräumen: **/ 
 			
-			t.deleteBuchung(3, conn);
+			db.deleteBuchung(3, conn);
+			db.deleteReise(2, conn);
+			db.deleteBallonfahrt(3, conn);
 			
 		} catch (MySQLIntegrityConstraintViolationException e) {
 			// TODO Auto-generated catch block
@@ -130,7 +135,7 @@ public class TestBallon {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("TInsertPassgaier geht nicht");
-//			fail();
+			fail();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("TInsertPassgaier geht nicht");
@@ -144,7 +149,7 @@ public class TestBallon {
 		try {
 			DBManager t= new DBManager();
 			conn = t.getConnection();
-			t.insertPassagier(4, "Hans", "Qurst", "h.w@mail.com", conn);
+			t.insertPassagier(3, "Hans", "Qurst", "h.w@mail.com", conn);
 			
 			String[] daten = new String[4];
 			daten = t.getPassagier(3, conn);
@@ -156,7 +161,7 @@ public class TestBallon {
 			
 			/** Aufräumen: **/ 
 			
-			t.deletePassagier(4, conn);
+			t.deletePassagier(3, conn);
 			
 		} catch (MySQLIntegrityConstraintViolationException e) {
 			// TODO Auto-generated catch block
@@ -172,6 +177,50 @@ public class TestBallon {
 			// TODO Auto-generated catch block
 			System.out.println("TestInsertPassgaier geht nicht");
 			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void shouldInsertReise(){
+		DBManager db;
+		try {
+			db = new DBManager();
+			conn = db.getConnection();
+			
+			db.insertBallonFahrt(3, "1.1.1", 122, 3, 2, 2, conn);
+			db.insertReise(2, 3, conn);
+			
+			String[] daten = new String[2];
+			daten = db.getReise(2, conn);
+			
+			assertEquals(2,daten[0]);
+			assertEquals(2, daten[1]);
+			
+			/** Aufräumen: **/ 
+			
+			db.deleteReise(2, conn);
+			db.deleteBallonfahrt(3, conn);
+
+		} catch (InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("TInsertReise geht nicht");
+		}
+		catch (MySQLIntegrityConstraintViolationException e) {
+			// TODO Auto-generated catch block
+			// Unique Constraint Violation --> Error ist OK
+			System.out.println("TInsertReise geht nichtgeht nicht, aber ok da FK Fehler");
+			assertTrue(true);
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Fehler SQL TestInsertReise");
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Classnotfound TestInsertReise");
 		}
 	}
 
@@ -192,9 +241,8 @@ public class TestBallon {
 			
 			/** Aufräumen: **/ 
 			
-			t.deleteOrt(3, conn);
+			t.deleteOrt(6, conn);
 			
-
 		} catch (InstantiationException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -254,12 +302,11 @@ public class TestBallon {
 	}
 
 	@Test
-	public void shouldGetPassagier(){
+	public void shouldGetPassagiere(){
 		DBManager db;
 		try {
 			db = new DBManager();
 			conn = db.getConnection();
-
 			assertTrue(db.getPassagier(2,conn)!=null);
 
 		} catch (InstantiationException | IllegalAccessException e) {
@@ -283,6 +330,43 @@ public class TestBallon {
 			conn = db.getConnection();
 
 			assertTrue(db.getBuchungen(conn)!=null);
+
+		} catch (InstantiationException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+//			fail();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	@Test
+	public void shouldGetBuchung(){
+		DBManager db;
+		try {
+			db = new DBManager();
+			conn = db.getConnection();
+
+			Calendar calendar = Calendar.getInstance();
+			java.sql.Timestamp d = new java.sql.Timestamp(calendar.getTime().getTime());
+
+			SimpleDateFormat dn = new SimpleDateFormat("dd.MM.yyyy");
+			String pD = dn.format(calendar.getTime());
+			
+			db.insertBuchung(3, pD , 1, 1, conn);
+			
+			String[] daten = new String[5];
+			daten = db.getBuchung(3, conn);
+			
+			assertEquals(3,daten[0]);
+			assertEquals(pD,daten[1]);
+			assertEquals(1,daten[2]);
+			assertEquals(1,daten[3]);
 
 		} catch (InstantiationException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
@@ -398,10 +482,10 @@ public class TestBallon {
 			db = new DBManager();
 			conn = db.getConnection();
 			
-			db.insertPassagier(3, "Name", "Name", "mail@mail.com", conn);
-			db.deletePassagier(3, conn);
+			db.insertPassagier(4, "Name", "Name", "mail@mail.com", conn);
+			db.deletePassagier(4, conn);
 			
-			assertNull(db.getPassagier(3,conn));
+			assertNull(db.getPassagier(4,conn));
 			
 		} catch (InstantiationException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
@@ -429,11 +513,14 @@ public class TestBallon {
 		try {
 			db = new DBManager();
 			conn = db.getConnection();
+			db.insertBallonFahrt(3, "1.1.1", 122, 3, 2, 2, conn);
+			db.insertReise(2,3,conn);
 			
-			db.insertReise(3,3,conn);
-			db.deleteReise(3, conn);
 			
-			assertNull(db.getReise(3,conn));
+			db.deleteReise(2, conn);
+			db.deleteBallonfahrt(3, conn);
+			
+			assertNull(db.getReise(2,conn));
 			
 		} catch (InstantiationException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
@@ -461,10 +548,19 @@ public class TestBallon {
 		try {
 			db = new DBManager();
 			Connection con = db.getConnection();
-			db.deletBallonfahrt(2, con);
+			
+			Calendar calendar = Calendar.getInstance();
+			java.sql.Timestamp d = new java.sql.Timestamp(calendar.getTime().getTime());
+
+			SimpleDateFormat dn = new SimpleDateFormat("dd.MM.yyyy");
+			String pD = dn.format(calendar.getTime());
+			
+			db.insertBuchung(2, pD , 1, 1, conn);
+			db.deleteBallonfahrt(2, con);
 			System.out.println("TestDeleteBallonfahrt");
 			
 			assertNull(db.getBallonfahrt(2,conn));
+			
 			
 		} catch (InstantiationException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
