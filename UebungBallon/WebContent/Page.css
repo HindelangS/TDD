@@ -1,0 +1,78 @@
+@charset "UTF-8";
+
+head {
+    background-color: lightblue;
+	border-radius: 2px;
+}
+
+body {
+    
+	border-radius: 2px;
+}
+
+h1 {
+    background-color: #4682E4;
+	color: white;
+	border-radius: 5px;
+    text-align: center;
+	font-family: "Times New Roman", Times, serif; 
+}
+
+input {
+    background-color: #D2D6E4;
+	border-radius: 5px;
+    text-align: center;
+	font-family: "Times New Roman", Times, serif; 
+}
+
+button {
+	
+	background-color: #D2D6E4;
+	border-radius: 5px;
+    text-align: center;
+	font-family: "Times New Roman", Times, serif; 
+	
+}
+
+#hintergrund {
+
+	background-image: url(ballonfahrt1.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    width:100%;
+  	height:100%;
+    padding: 15px;
+    border-radius: 5px;
+    z-index:0;
+}
+
+table {
+	width: 100%;
+}
+
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+th, td {
+	padding: 3px;
+	text-align: left;
+	border: 2px solid black;
+}
+
+table.names tr:nth-child(even) {
+	background-color: #4682E4;
+	text-align: center;
+}
+
+table.names tr:nth-child(odd) {
+	background-color: #4682E4;
+	text-align: center;
+}
+
+table.names th {
+	background-color: #D2D6E4;
+	color: white,
+}
