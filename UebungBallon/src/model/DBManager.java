@@ -445,6 +445,73 @@ public class DBManager {
 		}
 
 	}
+
+	public void RegisterBenutzer(Connection conn, String username, String pwd) throws SQLException {
+
+		System.out.println("Connecting DB successful");
+
+		String SQL = "INSERT into benutzer (benutzername,passwort) values(?,?);";
+		PreparedStatement ps = conn.prepareStatement( SQL);  
+
+		ps.setString(1,username);
+		ps.setString(2,pwd);
+
+		int i = ps.executeUpdate();
+		System.out.println(SQL);
+
+		if(i > 0 ) System.out.println("error");
+		
+	}
+	
+	public String getUser(Connection conn,String username) {
+
+		String SQL="select benutzername from benutzer where benutzername='"+username+"'";
+		String user=null;
+
+		try {
+			PreparedStatement pstmt=conn.prepareStatement(SQL);
+			ResultSet rs=pstmt.executeQuery();
+			pstmt=conn.prepareStatement(SQL);
+			rs=pstmt.executeQuery();
+
+			while(rs.next())
+			{
+				user=rs.getString(1);
+			}
+			rs.close(); rs=null;
+			pstmt.close(); pstmt=null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return user;
+	}
+
+	public static boolean checkUser(Connection conn, String username, String pwd) {
+
+		boolean st = false; 
+		String sql = "SELECT * FROM benutzer where benutzername=? and passwort=?";
+
+		System.out.println("Connecting to database...");
+
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+
+			pstmt.setString(1,  username);
+			pstmt.setString(2,  pwd);
+
+			ResultSet rs = pstmt.executeQuery(); 
+
+			st = rs.next();
+
+			pstmt.close(); pstmt=null;
+			rs.close(); rs=null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Connecting not successful");
+		}
+		return st; 
+	}
+	
 	
 	
 //	public static void main(String[] argv) {

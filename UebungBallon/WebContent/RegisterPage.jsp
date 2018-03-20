@@ -4,22 +4,22 @@
 <html>
 <link rel="stylesheet" type="text/css" href="Page.css">
 <head>
-	<title>Login Ballonfahrten</title>
+	<title>Register für Ballonfahrten</title>
 	<meta charset="UTF-8">
 <head>
 
 <body>
 	<div id="hintergrund">
-		<form method="POST" action="/UebungBallon/LoginServlet">
+		<form method="POST" action="/UebungBallon/RegisterServlet">
 			<p>Name: </p>
 			<input type='text' name='usr' align='center' /> </br>
 			<p>Passwort: </p>
 			<input type='password' name='pwd' align='center'/> </br> 
+			<p>Passwort wiederholen: </p>
+			<input type='password' name='pwd2' align='center'/> </br> 
 			<br>
-			<input type='submit' value='Anmelden'> 
+			<input type='submit' value='Registrieren'>
 		</form>
-		
-		<form  action="/UebungBallon/RegisterPage.jsp"> <input type='submit' value='Register'>  </form>
 	</div>
 </body>
 </html>

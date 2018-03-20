@@ -135,16 +135,18 @@
 	
 	String name; 
 	
-	if( request.getAttribute("usr") == null){
+	if( session.getAttribute("usr") == null){
 		name = "Achtung nicht angemeldet";
 		response.sendRedirect("LoginPage.jsp");
 	}else{
-		name = (String) request.getAttribute("usr");
+		name = (String) session.getAttribute("usr");
+		System.out.println("User: "+ name);
+		
 	}
 	
 	%>
 	
-<h1> Willkommen <i><%= name %> </i>, hier sehen Sie einen Überblick der Ballonfahrten und Buchungen</i> </h1>
+<h1> Willkommen <i><%= name %></i>, hier sehen Sie einen Überblick der Ballonfahrten und Buchungen </h1>
 
 		<h1>Bitte füllen Sie hier ihre Daten ein um Ihren Rundflug zu Buchen:</h1>
 
