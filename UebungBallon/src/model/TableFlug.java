@@ -3,7 +3,7 @@ package model;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
-public class TableBallon {
+public class TableFlug {
 
 	int flugID;
 	String anzPers;
@@ -13,7 +13,7 @@ public class TableBallon {
 	int preis;
 	int platze;
 	
-	public TableBallon() {
+	public TableFlug() {
 		super();
 		
 		this.flugID = -1;
@@ -25,7 +25,7 @@ public class TableBallon {
 		this.platze = -1;
 	}
 	
-	public TableBallon(int flugID, String anzPers, String ort, String pilotID, int preis, int platz, String zeitpunkt ) {
+	public TableFlug(int flugID, String anzPers, String ort, String pilotID, int preis, int platz, String zeitpunkt ) {
 		super();
 		
 		this.flugID = flugID;
@@ -38,22 +38,9 @@ public class TableBallon {
 
 	}
 	
-	public String getFlug(int fid) {
+	public int getFlug() {
+		return flugID;
 		
-		switch(fid) {
-		case 1: 
-			return (String) "Über den Wolken 1"; 
-		case 2:
-			return (String) "Wolke 7"; 
-		case 3:
-			return (String) "Fly High"; 
-		case 4:
-			return (String) "Morgenrot"; 
-		case 5:
-			return (String) "Abenddämmerung"; 
-		default:
-			return (String) "Rundflug"; 	
-		}
 	}
 	
 	public void setFlug(int flugID) {
@@ -123,7 +110,7 @@ public class TableBallon {
 
 	@Override
 	public String toString() {
-		return "TableBallon [flugID=" + flugID + ", anzPers=" + anzPers + ", ort=" + ort + ", pilotID=" + pilotID
+		return "TableFlug [flugID=" + flugID + ", anzPers=" + anzPers + ", ort=" + ort + ", pilotID=" + pilotID
 				+", preis=" + preis + ", platze=" + platze + ", zeitpunkt=" + zeitpunkt + "]";
 	}
 }

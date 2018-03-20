@@ -1,5 +1,3 @@
-
-
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -39,10 +37,12 @@ public class LoginServlet extends HttpServlet {
 		if(username.equals("Sara") && password.equals("1234")){
 			
 			request.setAttribute("usr", username);
+			request.setCharacterEncoding("UTF-8");
+			response.setCharacterEncoding("UTF-8");
 			
 			RequestDispatcher view = request.getRequestDispatcher("MainPage.jsp"); //rd
-//			view.forward(request, response);
-			view.include(request, response);
+			view.forward(request, response);
+
 		}else {
 			
 			request.setAttribute("usr", "Erneut eingeben");

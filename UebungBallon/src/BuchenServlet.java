@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -13,7 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import model.DBManager;
-import model.TableBallon;
+import model.TableBuchung;
 
 /**
  * Servlet implementation class BuchenServlet
@@ -38,12 +37,11 @@ public class BuchenServlet extends HttpServlet {
 		Connection conn = null;
 		System.out.println("Get BUCHEN - Servlet");
 		
-		
 		try{
 			db = new DBManager();
 			conn = db.getConnection();
-			List <TableBallon> items = db.readMyTable(conn);  
-			for(TableBallon myT : items) {
+			List <TableBuchung> items = db.readBuchungen(conn);  
+			for(TableBuchung myT : items) {
 				System.out.println(myT);
 			}
 
@@ -52,10 +50,7 @@ public class BuchenServlet extends HttpServlet {
 			
 			response.getWriter().append(result);
 
-		}catch(SQLException e){
-			response.getWriter().append(e.getMessage()); 
-		}
-		catch (InstantiationException e) {
+		}catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

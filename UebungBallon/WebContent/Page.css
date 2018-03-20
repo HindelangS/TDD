@@ -2,7 +2,7 @@
 
 head {
     background-color: lightblue;
-	border-radius: 2px;
+	border-radius: 7px;
 }
 
 body {
@@ -57,18 +57,18 @@ table, th, td {
 }
 
 th, td {
-	padding: 3px;
+	padding: 5px;
 	text-align: left;
-	border: 2px solid black;
+	border: 3px solid black;
 }
 
 table.names tr:nth-child(even) {
-	background-color: #4682E4;
+	background-color: #ffffff;
 	text-align: center;
 }
 
 table.names tr:nth-child(odd) {
-	background-color: #4682E4;
+	background-color: #ffffff;
 	text-align: center;
 }
 

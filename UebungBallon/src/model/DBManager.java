@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DBManager {
-
-	Statement stmt = null;
-	PreparedStatement pstmt = null;
-	ResultSet rs = null; 
 	
 	public DBManager() 
 
@@ -19,14 +15,11 @@ public class DBManager {
 		super();
 		/** DB Driver hinzufügen */
 		
-		
-		   
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
-
 
 	} 
 
-	public Connection getConnection() throws SQLException{
+	public Connection getConnection(){
 		/** neue Connection holen **/
 		Connection conn = null;
 		try{
@@ -37,10 +30,9 @@ public class DBManager {
 			System.out.println("SQLException :" + ex.getMessage());
 			System.out.println("SQLStatus :" + ex.getSQLState());
 			System.out.println("SQLException :"+ex.getErrorCode());
-			throw ex; 	
+ 	
 		}
 		return conn;
-
 	}
 
 	public void releaseConnection(Connection conn){
@@ -53,18 +45,18 @@ public class DBManager {
 		}
 	}
 
-	public List<TableBallon> readMyTable(Connection conn) throws SQLException{
+	public List<TableFlug> readFluege(Connection conn) {
 		// TODO Auto-generated method stub
-		ArrayList<TableBallon> result = new ArrayList<>();
+		List<TableFlug> result = new ArrayList<>();
 		String query = "SELECT ballonfahrt.FlugID, ballonfahrt.MaxAnzPersonen, ort.NameOrt, pilot.Vorname, "
 				+ "ballonfahrt.Zeitpunkt, ballonfahrt.Preis FROM ballonfahrt JOIN pilot USING(PilotID) "
 				+ "JOIN ort USING(OrtID);";
-		stmt = null; 
-		rs = null;
+		PreparedStatement pstmt = null; 
+		ResultSet rs = null;
 
 		try{
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(query);
+			pstmt = conn.prepareStatement(query);
+			rs = pstmt.executeQuery(query);
 
 			while(rs.next()){
 
@@ -76,292 +68,400 @@ public class DBManager {
 				int platz = rs.getInt("MaxAnzPersonen");
 				String zeitpunkt = rs.getString("zeitpunkt");
 
-				TableBallon item = new TableBallon(FlugID, anzPers, ort, pilotID, preis,platz, zeitpunkt);
+				TableFlug item = new TableFlug(FlugID, anzPers, ort, pilotID, preis,platz, zeitpunkt);
 				result.add(item);
 
 			}
-			rs.close(); rs= null;
-			stmt.close(); stmt = null; 
+			rs.close(); 
+			rs= null;
+			pstmt.close(); 
+			pstmt = null; 
 			return result;
 
 		}catch(SQLException ex){
-			if(rs != null) rs.close();
-			if(stmt != null) stmt.close();
-			throw ex; 
+			if(rs != null) rs = null;
+			if(pstmt != null) pstmt = null;
+ 
+		}
+		return result;
+	}
+	
+	
+	public List<TableBuchung> readBuchungen(Connection conn) {
+		// TODO Auto-generated method stub
+		ArrayList<TableBuchung> result = new ArrayList<>();
+		String query = "SELECT buchung.BuchungsID, passagier.PassagierID, passagier.VorName, passagier.NachName, "
+				+ "buchung.Datum FROM buchung JOIN passagier USING(PassagierID)";
+		PreparedStatement pstmt = null; 
+		ResultSet rs = null;
+
+		try{
+			pstmt = conn.prepareStatement(query);
+			rs = pstmt.executeQuery(query);
+
+			while(rs.next()){
+
+				int bID= rs.getInt("BuchungsID");
+				int pID= rs.getInt("PassagierID");
+				String pVN = rs.getString("Vorname");
+				String pNN = rs.getString("Nachname");
+				String datum = rs.getString("Datum");
+
+				TableBuchung item = new TableBuchung(bID, pID, pVN, pNN, datum);
+				result.add(item);
+
+			}
+			rs.close(); 
+			rs= null;
+			pstmt.close(); 
+			pstmt = null; 
+			return result;
+
+		}catch(SQLException ex){
+			if(rs != null) rs = null;
+			if(pstmt != null) pstmt = null;
+ 
+		}
+		return result;
+	}
+	
+	public void insertPassagier( String vn, String nn, String e, Connection conn) {
+		// TODO Auto-generated method stub
+		String SQL = "INSERT INTO passagier (PassagierID, Vorname, Nachname, email) VALUES (?,?,?,?);";
+
+		try {
+//			stmt = conn.createStatement();
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+		pstmt.setString(1, vn);
+		pstmt.setString(2, nn);
+		pstmt.setString(3, e);
+		pstmt.executeUpdate();
+		pstmt.close();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 	
-	public void insertPassagier(int pid, String vn, String nn, String e, Connection conn) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "INSERT INTO passagier (PassagierID, Vorname, Nachname, email) VALUES (?,?,?,?);";
-			stmt = conn.createStatement();
-			pstmt.setInt(1, pid);
-			pstmt.setString(2, vn);
-			pstmt.setString(3, nn);
-			pstmt.setString(4, e);
-			stmt.executeUpdate(SQL);
-			stmt.close();
-	}
-	
-	public void insertOrt(int oid,int plz, String Ortsname, Connection conn) throws SQLException{
+	public void insertOrt(int oid,int plz, String Ortsname, Connection conn) {
 		// TODO Auto-generated method stub
 		String SQL = "INSERT INTO ort (OrtID,PLZ,NameOrt) VALUES (?,?,?);";
+		PreparedStatement pstmt;
+		try {
 			pstmt = conn.prepareStatement(SQL);
 			pstmt.setInt(1, oid);
 			pstmt.setInt(2,plz);
 			pstmt.setString(3,Ortsname);
 			pstmt.executeUpdate();
 			pstmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
 	}
 	
 	
-	public void insertReise(int rbID, int fID, Connection conn) {
+	public void insertBuchung(String datum, int pID, int fID, Connection conn) {
 		// TODO Auto-generated method stub
-		String SQL = "INSERT INTO reise (ReiseBuchungsID, FlugIDs) VALUES (?,?);";
+		String SQL = "INSERT INTO buchung (Datum,PassagierID,FlugID) VALUES (?,?,?);";
+		PreparedStatement pstmt;
 		try {
-			stmt = conn.createStatement();
-			pstmt.setInt(1, rbID);
-			pstmt.setInt(1, fID);
-			stmt.executeUpdate(SQL);
-			stmt.close();
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, datum);
+			pstmt.setInt(2,pID);
+			pstmt.setInt(3,fID);
+			pstmt.executeUpdate();
+			pstmt.close();	pstmt = null; 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			
+		
+	}
+	
+	public void insertBallonFahrt(String zp, int p, int maxp, int pID, int oid, Connection conn) {
+		// TODO Auto-generated method stub
+		String SQL = "INSERT INTO ballonfahrt (Zeitpunkt,Preis, MaxAnzPersonen, PilotID, OrtID) VALUES (?,?,?,?,?);";
+		
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, zp);
+			pstmt.setInt(2,p);
+			pstmt.setInt(3,maxp);
+			pstmt.setInt(4,pID);
+			pstmt.setInt(5,oid);
+			pstmt.executeUpdate();
+			pstmt.close();	pstmt = null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void insertBuchung(int idb, String datum, int pID, int rID, Connection conn) throws SQLException {
-		// TODO Auto-generated method stub
-		String SQL = "INSERT INTO buchung (BuchungsID,Datum,PassagierID, ReiseBuchungsID) VALUES (?,?,?,?);";
-		pstmt = conn.prepareStatement(SQL);
-		pstmt.setInt(1, idb);
-		pstmt.setString(1, datum);
-		pstmt.setInt(3,pID);
-		pstmt.setInt(3,rID);
-		pstmt.executeUpdate();
-		pstmt.close();		
-		
-	}
-	
-	public void insertBallonFahrt(int fID, String zp, int p, int maxp, int pID, int oid, Connection conn) throws SQLException {
-		// TODO Auto-generated method stub
-		String SQL = "INSERT INTO ballonfahrt (FlugID,Zeitpunkt,Preis, MaxAnzPersonen, PilotID, OrtID) VALUES (?,?,?,?,?,?);";
-		pstmt = conn.prepareStatement(SQL);
-		pstmt.setInt(1, fID);
-		pstmt.setString(1, zp);
-		pstmt.setInt(3,p);
-		pstmt.setInt(3,maxp);
-		pstmt.setInt(3,pID);
-		pstmt.setInt(3,oid);
-		pstmt.executeUpdate();
-		pstmt.close();	
-	}
-	
-	public String[][] getPassagiere(Connection con) throws SQLException{
+	public String[][] getPassagiere(Connection conn) {
 		// TODO Auto-generated method stub
 		String SQL = "Select * from passagier";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		System.out.println(99);
-		String[][] daten = new String[99][2];
-		int a = 0;
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[a][0] = rs.getString(1);
-			daten[a][1] = rs.getString(2);
-			daten[a][2] = rs.getString(3);
-			daten[a][3] = rs.getString(4);
-			System.out.println(daten[a][0]+" | "+daten[a][1]);
-			a++;
+		PreparedStatement stmt;
+		String[][] daten = null;
+		try {
+			stmt = conn.prepareStatement(SQL);
+			ResultSet rs = stmt.executeQuery(SQL);
+			System.out.println(99);
+			daten = new String[99][5];
+			int a = 0;
+			while(rs.next()){
+				System.out.println(rs.getString(1));
+				daten[a][0] = rs.getString(1);
+				daten[a][1] = rs.getString(2);
+				daten[a][2] = rs.getString(3);
+				daten[a][3] = rs.getString(4);
+				System.out.println(daten[a][0]+" | "+daten[a][1]);
+				a++;
+
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return daten;
 	}
-	
-	public String[] getPassagier(int pid,Connection con) throws SQLException{
+
+	public String[] getPassagier(int pid,Connection conn){
 		// TODO Auto-generated method stub
-		String SQL = "Select * from passagier WHERE PassagierID = '"+pid+"'";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		System.out.println(99);
-		String[] daten = new String[99+1];
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[0] = rs.getString(1);
-			daten[1] = rs.getString(2);
-			daten[2] = rs.getString(3);
-			daten[3] = rs.getString(4);
-			System.out.println(daten[0]+" | "+daten[1]);
+		String SQL = "Select * from passagier WHERE PassagierID = '"+pid+"'  ";
+		ResultSet rs;
+		String[] daten = null;
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			rs = pstmt.executeQuery(SQL);
+			daten = new String[3];
+			while(rs.next()){
+				System.out.println(rs.getString(1));
+				daten[0] = rs.getString(1);
+				daten[1] = rs.getString(2);
+				daten[2] = rs.getString(3);
+				daten[3] = rs.getString(4);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return daten;	
 	}
 	
-	public String[] getBallonfahrt(int fid,Connection con) throws SQLException{
+	public String[] getBallonfahrt(int fid,Connection conn){
 		// TODO Auto-generated method stub
 		String SQL = "Select * from BallonFahrt WHERE FlugID = '"+fid+"'";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		System.out.println(99);
-		String[] daten = new String[99+1];
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[0] = rs.getString(1);
-			daten[1] = rs.getString(2);
-			daten[2] = rs.getString(3);
-			daten[3] = rs.getString(4);
-			System.out.println(daten[0]+" | "+daten[1]);
+		String[] daten = null;
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			ResultSet rs = pstmt.executeQuery(SQL);
+			daten = new String[99];
+			while(rs.next()){
+//				System.out.println(rs.getString(1));
+				daten[0] = rs.getString(1);
+				daten[1] = rs.getString(2);
+				daten[2] = rs.getString(3);
+				daten[3] = rs.getString(4);
+				System.out.println(daten[0]+" | "+daten[1]);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 		return daten;	
 	}
 	
-	public String[][] getBuchungen(Connection con) throws SQLException{
+	public String[][] getBuchungen(Connection conn) {
 		// TODO Auto-generated method stub
 		String SQL = "Select * from buchung";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		System.out.println(99);
-		String[][] daten = new String[99+1][2];
-		int a = 0;
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[a][0] = rs.getString(1);
-			daten[a][1] = rs.getString(2);
-			daten[a][2] = rs.getString(3);
-			daten[a][3] = rs.getString(4);
-			System.out.println(daten[a][0]+" | "+daten[a][1]);
-			a++;
+		PreparedStatement pstmt;
+		String[][] daten = null;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			ResultSet rs = pstmt.executeQuery(SQL);
+
+			daten = new String[99][7];
+			int a = 0;
+			while(rs.next()){
+				System.out.println(rs.getString(1));
+				daten[a][0] = rs.getString(1);
+				daten[a][1] = rs.getString(2);
+				daten[a][2] = rs.getString(3);
+				daten[a][3] = rs.getString(4);
+				daten[a][4] = rs.getString(5);
+				a++;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 		return daten;
 	}
 	
-	public String[] getBuchung(int bid, Connection con) throws SQLException{
+	public Buchung getBuchung(int bid, Connection conn){
 		// TODO Auto-generated method stub
 		String SQL = "Select * from buchung WHERE BuchungsID='"+bid+"'";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		System.out.println(99);
-		String[] daten = new String[99];
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[0] = rs.getString(1);
-			daten[1] = rs.getString(2);
-			daten[2] = rs.getString(3);
-			daten[3] = rs.getString(4);
-			System.out.println(daten[0]+" | "+daten[1]);
-		}
-		return daten;
-	}
-	
-	public String[] getReise(int rid, Connection con) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "Select * from reise WHERE ReiseBuchungsID='"+rid+"'";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		System.out.println(99);
-		String[] daten = new String[99+1];
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[0] = rs.getString(1);
-			daten[1] = rs.getString(2);
+//		String[] daten = null;
+		Buchung buchung = null;
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			ResultSet rs = pstmt.executeQuery(SQL);
+//			daten = new String[99];
+			while(rs.next()){
+//				daten[0] = rs.getString(1);
+//				daten[1] = rs.getString(2);
+//				daten[2] = rs.getString(3);
+//				daten[3] = rs.getString(4);
+				
+				int bID = rs.getInt(1);
+				String d = rs.getString(2);
+				int pID = rs.getInt(3);
+				int rbID = rs.getInt(4);
 
-			System.out.println(daten[0]+" | "+daten[1]);
+				buchung= new Buchung(bID,d,pID,rbID); 
+				return buchung;			
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return daten;
+		
+		return buchung;
 	}
 	
-	
-	public String[][] getOrte(Connection con) throws SQLException{
+	public String[][] getOrte(Connection conn) {
 		// TODO Auto-generated method stub
 		String SQL = "Select * from ort ";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		String[][] daten = new String[5][5];
-		int a = 0;
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[a][0] = rs.getString(1);
-			daten[a][1] = rs.getString(2);
-			daten[a][2] = rs.getString(3);
-			System.out.println(daten[a][0]+" | "+daten[a][1]+" | "+daten[a][2]);
-			a++;
+		String[][] daten = null; 
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			ResultSet rs = pstmt.executeQuery(SQL);
+			daten = new String[5][5];
+			int a = 0;
+			while(rs.next()){
+				System.out.println(rs.getString(1));
+				daten[a][0] = rs.getString(1);
+				daten[a][1] = rs.getString(2);
+				daten[a][2] = rs.getString(3);
+				System.out.println(daten[a][0]+" | "+daten[a][1]+" | "+daten[a][2]);
+				a++;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 		return daten;
 	}
 
-	public String[] getOrt(int oid,Connection con) throws SQLException{
+	public String[] getOrt(int oid,Connection conn) {
 		// TODO Auto-generated method stub
 		String SQL = "Select * from ort WHERE OrtID = '"+oid+"'";
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(SQL);
-		System.out.println(99);
-		String[] daten = new String[5];
-		while(rs.next()){
-			System.out.println(rs.getString(1));
-			daten[0] = rs.getString(1);
-			daten[1] = rs.getString(2);
-			daten[2] = rs.getString(3);
-			System.out.println(daten[0]+" | "+daten[1]+" | "+daten[2]);
+		String[] daten = null; 
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			ResultSet rs = pstmt.executeQuery(SQL);
+			daten = new String[5];
+			while(rs.next()){
+				System.out.println(rs.getString(1));
+				daten[0] = rs.getString(1);
+				daten[1] = rs.getString(2);
+				daten[2] = rs.getString(3);
+				System.out.println(daten[0]+" | "+daten[1]+" | "+daten[2]);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 		return daten;
 	}
 	
-	public void deletePassagier(int pid,Connection conn) throws SQLException{
+	public void deletePassagier(int pid,Connection conn) {
 		// TODO Auto-generated method stub
 		String SQL = "DELETE FROM passagier WHERE PassagierID = '"+pid+"'";
-		stmt = conn.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);	
+			pstmt.executeUpdate(SQL);
+			pstmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 	}
 	
-	public void deleteOrt(int oid,Connection conn) throws SQLException{
+	public void deleteOrt(int oid,Connection conn) {
 		// TODO Auto-generated method stub
 		String SQL = "DELETE FROM ort WHERE OrtID = '"+oid+"'";
-		stmt = conn.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	public void deleteBuchung(int bid,Connection conn) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM buchung WHERE BuchungsID = '"+bid+"'";
-		stmt = conn.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	public void deleteReise(int rid,Connection con) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM reise WHERE ReiseBuchungsID = '"+rid+"'";
-		stmt = con.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	public void deleteBallonfahrt(int flid,Connection con) throws SQLException{
-		// TODO Auto-generated method stub
-		String SQL = "DELETE FROM ballonfahrt WHERE FlugID = '"+flid+"'";
-		stmt = con.createStatement();
-		stmt.executeUpdate(SQL);
-		stmt.close();
-	}
-	
-	
-	
-	public static void main(String[] argv) {
-
-		try{
-			DBManager db = new DBManager();
-			Connection conn = db.getConnection();
-			List<TableBallon> elemente = db.readMyTable(conn);
-			for(TableBallon e : elemente){
-				System.out.println(e);
-			}
-			db.releaseConnection(conn);
-		}catch(Exception e){
-			System.err.println(e.getMessage());
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.executeUpdate(SQL);
+			pstmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
+	
+	public void deleteBuchung(int bid,Connection conn) {
+		// TODO Auto-generated method stub
+		String SQL = "DELETE FROM buchung WHERE BuchungsID = '"+bid+"'";
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.executeUpdate(SQL);
+			pstmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void deleteBallonfahrt(int flid,Connection conn) {
+		// TODO Auto-generated method stub
+		String SQL = "DELETE FROM ballonfahrt WHERE FlugID = '"+flid+"'";
+		PreparedStatement pstmt;
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.executeUpdate(SQL);
+			pstmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+//	public static void main(String[] argv) {
+//
+//		try{
+//			DBManager db = new DBManager();
+//			Connection conn = db.getConnection();
+//			List<TableFlug> elemente = db.readFluege(conn);
+//			for(TableFlug e : elemente){
+//				System.out.println(e);
+//			}
+//			db.releaseConnection(conn);
+//		}catch(Exception e){
+//			System.err.println(e.getMessage());
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 }

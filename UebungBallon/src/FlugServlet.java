@@ -13,7 +13,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import model.DBManager;
-import model.TableBallon;
+import model.TableBuchung;
+import model.TableFlug;
 
 /**
  * Servlet implementation class FlugServlet
@@ -33,18 +34,16 @@ public class FlugServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
-	/*	
+			
 		Connection conn = null;
-		System.out.println("Get BUCHEN - Servlet");
-		
+		System.out.println("Get FLUG - Servlet");
 		
 		try{
 			db = new DBManager();
 			conn = db.getConnection();
-			List <TableBallon> items = db.readMyTable(conn);  
-			for(TableBallon myT : items) {
-				System.out.println(myT);
+			List <TableFlug> items = db.readFluege(conn);  
+			for(TableFlug myF : items) {
+				System.out.println(myF);
 			}
 
 			Gson gson = new GsonBuilder().create();
@@ -52,10 +51,7 @@ public class FlugServlet extends HttpServlet {
 			
 			response.getWriter().append(result);
 
-		}catch(SQLException e){
-			response.getWriter().append(e.getMessage()); 
-		}
-		catch (InstantiationException e) {
+		}catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
@@ -68,8 +64,6 @@ public class FlugServlet extends HttpServlet {
 		finally {  
 
 			if(conn != null) db.releaseConnection(conn);
-		}*/
-		
+		}	
 	}
-
 }

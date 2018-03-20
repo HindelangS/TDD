@@ -6,19 +6,17 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Ballonfahrten Tirol</title>
+<title> Ballonfahrten Tirol </title>
 </head>
 
 <script>
-	function loadDaten() {
+	function loadDatenFlug() {
 		var xhttp = new XMLHttpRequest();
-		console.log("Button wurde gedrückt");
+		console.log("Button Flug wurde gedrückt");
 		xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 				var arr = JSON.parse(this.responseText);
-				drawTableFlug(arr);
-				//drawTabelleBuchung();
-				
+				drawTableFlug(arr);				
 			}
 		};
 		xhttp.open("GET", "FlugServlet", true);
@@ -76,6 +74,57 @@
 		console.dir(s);
 		document.getElementById("flug").innerHTML = s;
 	}
+	
+	
+	function loadDatenBuchung() {
+		var xhttp = new XMLHttpRequest();
+		console.log("Button Buchung wurde gedrückt");
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var arr1 = JSON.parse(this.responseText);
+				drawTableBuchung(arr1);	
+			}
+		};
+		xhttp.open("GET", "BuchenServlet", true);
+		xhttp.send();
+	}
+
+	function drawTableBuchung(arr) {
+		var s = " ";
+		s += "<table class=\"names\" >";
+		s+= "<tr>"+"<th>BuchungsNr</th>"+"<th>Vorname</th>"+"<th>Nachname</th>"+"<th>Datum</th> </tr>";
+		var i;
+		for (i = 0; i < arr.length; i++) {
+			var row = arr[i];
+		
+			s += "<tr>";
+			s += "<td >";
+			s += row.bID;
+			s += " ";
+			s += "</td>";
+			s += " ";
+			s += "<td >";
+			s += row.pVN;
+			s += " ";
+			s += "</td>";
+			s += "<td >";
+			s += row.pNN;
+			s += " ";
+			s += "</td>";
+			s += " ";
+			s += "<td >";
+			s += row.zeitpunkt;
+			s += " ";
+			s += "</td>";
+			s += " ";
+			s += "</tr>";
+		}
+		s += "</table>";
+		
+		console.log(s);
+		console.dir(s);
+		document.getElementById("buchung").innerHTML = s;
+	}
 </script>
 
 <body>
@@ -95,8 +144,7 @@
 	
 	%>
 	
-<h1> Willkommen <%= name %></h1>
-
+<h1> Willkommen <i><%= name %> </i>, hier sehen Sie einen Überblick der Ballonfahrten und Buchungen</i> </h1>
 
 		<h1>Bitte füllen Sie hier ihre Daten ein um Ihren Rundflug zu Buchen:</h1>
 
@@ -119,7 +167,8 @@
 			<input type="radio" name="za"
 				value="Banküberweisung" align="center"> Banküberweisung <br>
 
-			<button type="button" onclick="loadDaten()" align="center"> Buchen </button>
+			<button type="button" onclick="loadDatenBuchung()" align="center"> Buchen </button>
+			<button type="button" onclick="loadDatenFlug()" align="center"> verfügbare Flüge ansehen </button>
 
 		</form>
 
